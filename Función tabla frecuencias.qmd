@@ -966,7 +966,8 @@ setClass(
 )
 
 # Función para generar una tabla de frecuencias y medidas descriptivas (Clase S4)
-tabla_frecuencias <- function(data, column, k = NULL, decimales = 2, handle_outliers = FALSE, plot = FALSE, export = NULL, silent = FALSE) {
+tabla_frecuencias <- function(data, column, k = NULL, decimales = 2, handle_outliers = FALSE, 
+                             plot = FALSE, export = NULL, silent = FALSE, view_table = FALSE) {
   
   # Validar que data sea un dataframe
   if (!is.data.frame(data)) {
@@ -1212,8 +1213,8 @@ tabla_frecuencias <- function(data, column, k = NULL, decimales = 2, handle_outl
     show(resultado)
   }
   
-  # Visualización en entorno interactivo
-  if (interactive() && !silent) {
+  # Visualización en entorno interactivo solo si view_table = TRUE
+  if (interactive() && !silent && view_table) {
     View(tabla_frecuencias)
   }
   
@@ -1260,6 +1261,16 @@ setMethod("plot", "TablaFrecuencias", function(x, y, ...) {
     print(x@grafico)
   }
 })
+```
+
+**Veremos un ejemplo, de como hacer uso de la característica S4**
+
+```{r}
+data(mtcars)
+
+OUT <- tabla_frecuencias(mtcars, column = "mpg", plot = TRUE)
+
+OUT@grafico
 ```
 
 A continuación, se presenta una breve explicación de lo que realiza cada una de las 25 pruebas del conjunto de pruebas unitarias para la función `tabla_frecuencias` utilizando el paquete testthat. Cada prueba verifica un aspecto específico del comportamiento de la función, cubriendo validaciones de entrada, cálculos, manejo de valores atípicos, exportación, gráficos y métodos S4.
@@ -1478,12 +1489,26 @@ test_that("Calcula correctamente otras medidas descriptivas", {
 # Prueba 15: Validar que el gráfico se genera si plot = TRUE
 test_that("Genera un gráfico si plot = TRUE", {
   skip_if_not_installed("ggplot2")
+  
+  # Ejecutar la función
   resultado <- tabla_frecuencias(data = df_test, column = "valores", plot = TRUE, silent = TRUE)
   
+  # Verificar que resultado es un objeto S4 de clase TablaFrecuencias
+  expect_s4_class(resultado, "TablaFrecuencias")
+  
+  # Verificar que el slot grafico no es NULL y es de clase ggplot
   expect_true(!is.null(resultado@grafico))
   expect_s3_class(resultado@grafico, "ggplot")
 })
 ```
+
+La línea expect_s3_class(resultado\@grafico, "ggplot") se usa porque:
+
+-   El slot grafico debe contener un objeto de clase S3 "ggplot" generado por ggplot2.
+
+-   expect_s3_class es la función adecuada de testthat para verificar clases S3.
+
+-   Garantiza que la función tabla_frecuencias produce un gráfico correcto cuando plot = TRUE.
 
 **Prueba 16:** Lanza advertencia si ggplot2 no está instalado Confirma que la función lanza una advertencia si plot = TRUE pero el paquete ggplot2 no está instalado.
 
@@ -1756,7 +1781,7 @@ El cual esta formado por las siguientes variables:
 | **17** |  vida_cotidiana  |   Cualitativa (caracter)   |
 | **18** |     Puntaje      |  Cuantitativa (discreta)   |
 
-A continuación mostraremos ejemplos del uso de la función `tabla_frecuencias` :
+A continuación mostraremos ejemplos del uso de la función `tabla_frecuencias` con datos reales:
 
 **Ejemplo 1**
 
