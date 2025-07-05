@@ -143,8 +143,14 @@ test_that("Calcula correctamente otras medidas descriptivas", {
 # Prueba 15: Validar que el gráfico se genera si plot = TRUE
 test_that("Genera un gráfico si plot = TRUE", {
   skip_if_not_installed("ggplot2")
+  
+  # Ejecutar la función
   resultado <- tabla_frecuencias(data = df_test, column = "valores", plot = TRUE, silent = TRUE)
   
+  # Verificar que resultado es un objeto S4 de clase TablaFrecuencias
+  expect_s4_class(resultado, "TablaFrecuencias")
+  
+  # Verificar que el slot grafico no es NULL y es de clase ggplot
   expect_true(!is.null(resultado@grafico))
   expect_s3_class(resultado@grafico, "ggplot")
 })
@@ -216,7 +222,7 @@ test_that("Crea correctamente el objeto TablaFrecuencias", {
                     "Frecuencia_Relativa", "Frecuencia_Relativa_Acumulada",
                     "Frecuencia_Porcentual", "Frecuencia_Porcentual_Acumulada") %in%
                     names(resultado@tabla_frecuencias)))
-  expect_equal(resultado@decimales, 4)
+  expect_equal(resultado@decimales, 2)
   expect_equal(resultado@column, "valores")
 })
 

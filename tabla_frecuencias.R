@@ -42,7 +42,7 @@ setClass(
 )
 
 # Función para generar una tabla de frecuencias y medidas descriptivas (Clase S4)
-tabla_frecuencias <- function(data, column, k = NULL, decimales = 4, handle_outliers = FALSE, plot = FALSE, export = NULL, silent = FALSE) {
+tabla_frecuencias <- function(data, column, k = NULL, decimales = 2, handle_outliers = FALSE, plot = FALSE, export = NULL, silent = FALSE) {
   
   # Validar que data sea un dataframe
   if (!is.data.frame(data)) {
